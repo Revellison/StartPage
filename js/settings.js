@@ -131,30 +131,37 @@ class Settings {
     }
 
     loadSettings() {
-
         const backgroundSettings = JSON.parse(localStorage.getItem('backgroundSettings') || '{}');
         
-        if (backgroundSettings.image) {
-            document.body.classList.add('has-background');
-            document.body.style.setProperty('--bg-image', `url('${backgroundSettings.image}')`);
+        if (backgroundSettings.source) {
+            const imageUrl = backgroundSettings.source === 'local' ? backgroundSettings.dataUrl : backgroundSettings.url;
             
-            if (backgroundSettings.blur) {
-                document.body.style.setProperty('--bg-blur', `${backgroundSettings.blur}px`);
-                this.bgBlurCheckbox.checked = true;
-            }
-            
-            if (backgroundSettings.opacity) {
-                document.body.style.setProperty('--bg-opacity', backgroundSettings.opacity);
-                this.bgOpacitySlider.value = backgroundSettings.opacity * 100;
-            }
-            
+            if (imageUrl) {
+                document.body.classList.add('has-background');
+                document.body.style.setProperty('--bg-image', `url(${imageUrl})`);
+                
+                if (backgroundSettings.blur) {
+                    document.body.style.setProperty('--bg-blur', `${backgroundSettings.blur}px`);
+                    this.bgBlurCheckbox.checked = true;
+                }
+                
+                if (backgroundSettings.opacity) {
+                    document.body.style.setProperty('--bg-opacity', backgroundSettings.opacity);
+                    this.bgOpacitySlider.value = backgroundSettings.opacity * 100;
+                }
 
-            if (backgroundSettings.source === 'url' && backgroundSettings.url) {
-                this.bgUrlInput.value = backgroundSettings.url;
-                this.switchSourceTab('url');
-            } else if (backgroundSettings.source === 'local' && backgroundSettings.dataUrl) {
-                this.switchSourceTab('local');
-                this.applyLocalBackground(backgroundSettings.dataUrl);
+                if (backgroundSettings.source === 'url') {
+                    this.bgUrlInput.value = backgroundSettings.url;
+                    this.switchSourceTab(document.querySelector('[data-source="url"]'));
+                } else if (backgroundSettings.source === 'local') {
+                    this.switchSourceTab(document.querySelector('[data-source="local"]'));
+                    
+                    // Восстановление предпросмотра локального файла
+                    this.filePreviewImg.src = backgroundSettings.dataUrl;
+                    const fileName = backgroundSettings.dataUrl.split('/').pop().split(';')[0] || 'image';
+                    this.fileName.textContent = fileName === 'image' ? 'Загруженное изображение' : fileName;
+                    this.filePreview.classList.add('show');
+                }
             }
         }
         
@@ -394,14 +401,27 @@ class Settings {
         
         document.body.classList.add('has-background');
         document.body.style.setProperty('--bg-image', `url(${url})`);
-        this.saveBackgroundSettings(url);
+        
+        // Сохраняем с явным указанием URL
+        let currentSettings = JSON.parse(localStorage.getItem('backgroundSettings') || '{}');
+        const settings = {
+            ...currentSettings,
+            source: 'url',
+            url: url,
+            blur: this.bgBlurCheckbox.checked ? 10 : 0,
+            opacity: this.bgOpacitySlider.value / 100
+        };
+        localStorage.setItem('backgroundSettings', JSON.stringify(settings));
     }
 
     resetBackground() {
         this.bgUrlInput.value = '';
+        this.filePreview.classList.remove('show');
+        this.filePreviewImg.src = '';
+        this.fileName.textContent = '';
         document.body.classList.remove('has-background');
         document.body.style.removeProperty('--bg-image');
-        this.saveBackgroundSettings();
+        localStorage.removeItem('backgroundSettings');
     }
 
     updateBackground() {
@@ -416,19 +436,30 @@ class Settings {
         document.body.style.setProperty('--bg-blur', blurEnabled ? '10px' : '0px');
         document.body.style.setProperty('--bg-opacity', opacityValue / 100);
         
-        this.saveBackgroundSettings();
+        // Сохраняем настройки, сохраняя текущий источник изображения
+        this.saveBackgroundSettings(null);
     }
 
     saveBackgroundSettings(imageSource = null) {
-        const url = imageSource || this.bgUrlInput.value;
-        const settings = {
-            url: url,
-            blur: this.bgBlurCheckbox.checked,
-            opacity: this.bgOpacitySlider.value,
-            isLocal: !!imageSource
-        };
+        let currentSettings = JSON.parse(localStorage.getItem('backgroundSettings') || '{}');
         
-        localStorage.setItem('bgSettings', JSON.stringify(settings));
+        // Обновляем только измененные настройки
+        const settings = {
+            ...currentSettings,
+            blur: this.bgBlurCheckbox.checked ? 10 : 0,
+            opacity: this.bgOpacitySlider.value / 100
+        };
+
+        // Обновляем источник и URL только если они предоставлены
+        if (imageSource !== null) {
+            settings.source = 'local';
+            settings.dataUrl = imageSource;
+        } else if (this.bgUrlInput.value.trim()) {
+            settings.source = 'url';
+            settings.url = this.bgUrlInput.value.trim();
+        }
+        
+        localStorage.setItem('backgroundSettings', JSON.stringify(settings));
     }
 
     setTheme(theme) {
