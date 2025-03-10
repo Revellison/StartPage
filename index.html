@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Page</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="controls-panel">
+            <button id="theme-toggle-btn" class="control-btn" title="Переключить тему">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="settings-btn" class="control-btn" title="Настройки">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <select id="search-engine">
+                    <option value="google">Google</option>
+                    <option value="yandex">Яндекс</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                </select>
+                <input type="text" id="search-input" placeholder="Поиск...">
+                <button id="search-button"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="bookmarks-container">
+            <h2>
+                Закладки
+                <button id="add-bookmark" class="add-bookmark-btn" title="Добавить закладку">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </h2>
+            <div class="bookmarks-grid" id="bookmarks">
+            </div>
+        </div>
+    </div>
+    <div id="bookmark-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить закладку</h3>
+            <input type="text" id="bookmark-title" placeholder="Название">
+            <input type="text" id="bookmark-url" placeholder="URL">
+            <input type="text" id="bookmark-icon" placeholder="URL иконки (необязательно)">
+            <div class="modal-buttons">
+                <button id="save-bookmark">Сохранить</button>
+                <button id="cancel-bookmark">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal settings-modal">
+        <div class="modal-content">
+            <div class="settings-header">
+                <h3>Настройки</h3>
+                <button id="close-settings" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-tab="appearance">Фон</button>
+                <button class="tab-btn" data-tab="display">Структура</button>
+                <button class="tab-btn" data-tab="themes">Темы(not working)</button>
+                <button class="tab-btn" data-tab="animations">Анимации</button>
+            </div>
+
+            <div class="settings-content">
+                <div class="tab-content active" id="appearance">
+                    <div class="setting-group">
+                        <label>Фоновое изображение</label>
+                        <div class="background-upload">
+                            <div class="background-source-tabs">
+                                <button class="source-tab active" data-source="url">Из URL</button>
+                                <button class="source-tab" data-source="local">Локальное</button>
+                            </div>
+                            <div class="source-content active" id="source-url">
+                                <div class="background-controls">
+                                    <input type="text" id="bg-url" placeholder="URL изображения или GIF">
+                                    <button id="apply-bg" class="btn apply-btn">Применить</button>
+                                    <button id="reset-bg" class="btn reset-btn">Сбросить</button>
+                                </div>
+                            </div>
+                            <div class="source-content" id="source-local">
+                                <div class="file-upload-container">
+                                    <input type="file" id="bg-file" accept="image/*" class="file-input">
+                                    <label for="bg-file" class="file-label">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Выберите изображение</span>
+                                    </label>
+                                    <div class="file-preview">
+                                        <img id="file-preview-img" src="" alt="">
+                                        <span class="file-name" id="file-name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="background-options">
+                            <label>
+                                <input type="checkbox" id="bg-blur">
+                                Размытие фона
+                            </label>
+                            <div class="range-container">
+                                <label>
+                                    <span>Прозрачность</span>
+                                    <span id="opacity-value">100%</span>
+                                </label>
+                                <input type="range" id="bg-opacity" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="display">
+                    <div class="display-settings">
+                        <div class="display-option">
+                            <h4>Размер элементов</h4>
+                            <p>Настройте масштаб интерфейса под ваши предпочтения</p>
+                            <div class="display-controls">
+                                <select id="ui-scale">
+                                    <option value="0.9">Компактный</option>
+                                    <option value="1" selected>Стандартный</option>
+                                    <option value="1.1">Увеличенный</option>
+                                    <option value="1.25">Крупный</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="display-option">
+                            <h4>Расположение элементов</h4>
+                            <p>Выберите предпочитаемое расположение компонентов</p>
+                            <div class="display-controls">
+                                <select id="layout-mode">
+                                    <option value="standard" selected>Стандартное</option>
+                                    <option value="compact">Компактное</option>
+                                    <option value="wide">Широкое</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="display-option">
+                            <h4>Количество закладок в строке</h4>
+                            <p>Укажите количество закладок, отображаемых в одной строке</p>
+                            <div class="display-controls">
+                                <select id="bookmarks-per-row">
+                                    <option value="4">4 закладки</option>
+                                    <option value="5" selected>5 закладок</option>
+                                    <option value="6">6 закладок</option>
+                                    <option value="auto">Автоматически</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="display-option">
+                            <h4>Расположение строки поиска</h4>
+                            <p>Выберите предпочитаемое расположение поисковой строки</p>
+                            <div class="display-controls">
+                                <select id="search-position">
+                                    <option value="top">Вверху</option>
+                                    <option value="center" selected>Посередине</option>
+                                    <option value="bottom">Внизу</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="display-option">
+                            <h4>Расположение закладок</h4>
+                            <p>Выберите где располагать блок закладок</p>
+                            <div class="display-controls">
+                                <select id="bookmarks-position">
+                                    <option value="top">Вверху</option>
+                                    <option value="middle" selected>Посередине</option>
+                                    <option value="bottom">Внизу</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="display-option">
+                            <h4>Видимость закладок</h4>
+                            <p>Показывать блок закладок на странице</p>
+                            <div class="display-controls">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-bookmarks" checked>
+                                    <span class="toggle-slider"></span>
+                                    Показывать закладки
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="display-option">
+                            <h4>Стиль закладок</h4>
+                            <p>Выберите компактность отображения закладок</p>
+                            <div class="display-controls">
+                                <select id="bookmarks-style">
+                                    <option value="default" selected>Стандартный</option>
+                                    <option value="compact">Компактный</option>
+                                    <option value="minimal">Минимальный</option>
+                                    <option value="tiles">Плитки</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="themes">
+                    <div class="setting-group">
+                        <label>Выберите тему</label>
+                        <div class="theme-selector">
+                            <button class="btn theme-btn" data-theme="light">Светлая</button>
+                            <button class="btn theme-btn" data-theme="dark">Тёмная</button>
+                            <button class="btn theme-btn" data-theme="custom">Своя</button>
+                        </div>
+                    </div>
+                    <div class="custom-theme-settings">
+                        <h4>Настройка своей темы</h4>
+                        <div class="color-picker-group">
+                            <label>Основной цвет фона
+                                <input type="color" id="custom-bg-start" data-var="--bg-gradient-start">
+                            </label>
+                            <label>Дополнительный цвет фона
+                                <input type="color" id="custom-bg-end" data-var="--bg-gradient-end">
+                            </label>
+                            <label>Цвет поверхностей
+                                <input type="color" id="custom-surface" data-var="--surface-color">
+                            </label>
+                            <label>Цвет текста
+                                <input type="color" id="custom-text" data-var="--text-color">
+                            </label>
+                            <label>Акцентный цвет
+                                <input type="color" id="custom-primary" data-var="--primary-color">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="animations">
+                    <div class="setting-group">
+                        <label>Настройки анимаций</label>
+                        <div class="animation-toggles">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="hover-animation" checked>
+                                <span class="toggle-slider"></span>
+                                Анимация при наведении
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="transition-animation" checked>
+                                <span class="toggle-slider"></span>
+                                Плавные переходы
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="background-animation" checked>
+                                <span class="toggle-slider"></span>
+                                Анимация фона
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/bookmarks.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html> 
